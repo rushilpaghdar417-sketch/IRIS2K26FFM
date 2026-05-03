@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IRIS 2K26 - Tournament Leaderboard</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tailwind Configuration for custom breakpoints -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          screens: {
+            'xs': '480px',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background-color: #050505;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    .font-title { font-family: 'Orbitron', sans-serif; }
+    .font-mono { font-family: 'Share Tech Mono', monospace; }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #ff7b00; }
+
+    /* Glassmorphism row effect */
+    .leaderboard-row {
+      background: linear-gradient(90deg, rgba(20,20,20,0.4) 0%, rgba(30,30,30,0.6) 50%, rgba(20,20,20,0.4) 100%);
+      transition: all 0.2s ease;
+    }
+    .leaderboard-row:hover {
+      background: linear-gradient(90deg, rgba(40,40,40,0.8) 0%, rgba(60,60,60,0.8) 50%, rgba(40,40,40,0.8) 100%);
+      box-shadow: inset 4px 0 0 #ff7b00;
+    }
+
+    /* Utilities */
+    .text-glow-orange { text-shadow: 0 0 15px rgba(234, 88, 12, 0.8); }
+  </style>
+</head>
+<body class="selection:bg-[#ff7b00] selection:text-black">
+
+  <!-- ===================================== -->
+  <!-- NAVBAR -->
+  <!-- ===================================== -->
+  <nav class="fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Logo -->
+        <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0, 0)">
+          <i data-lucide="crosshair" class="text-[#ff7b00] w-8 h-8"></i>
+          <span class="font-title text-2xl tracking-wider text-glow-orange text-white">
+            IRIS <span class="text-[#ff7b00]">2K26</span>
+          </span>
+        </div>
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:block">
+          <div class="ml-10 flex items-baseline space-x-8">
+            <a href="#home" class="text-gray-300 hover:text-[#ff7b00] hover:text-glow-orange px-3 py-2 rounded-md text-sm font-bold uppercase tracking-wider transition-all">Home</a>
+            <a href="#leaderboard" class="text-gray-300 hover:text-[#ff7b00] hover:text-glow-orange px-3 py-2 rounded-md text-sm font-bold uppercase tracking-wider transition-all">Leaderboard</a>
+            <a href="#schedule" class="text-gray-300 hover:text-[#ff7b00] hover:text-glow-orange px-3 py-2 rounded-md text-sm font-bold uppercase tracking-wider transition-all">Schedule</a>
+          </div>
+        </div>
+
+        <!-- Mobile menu button -->
+        <div class="md:hidden flex items-center">
+          <button id="mobile-menu-btn" class="text-gray-400 hover:text-white focus:outline-none p-2">
+            <i data-lucide="menu" id="menu-icon" class="h-8 w-8"></i>
+            <i data-lucide="x" id="close-icon" class="h-8 w-8 hidden"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 backdrop-blur-xl border-b border-white/10 absolute w-full left-0 top-20">
+      <div class="px-2 pt-2 pb-6 space-y-1 sm:px-3 flex flex-col">
+        <a href="#home" class="mobile-link text-gray-300 hover:text-[#ff7b00] block px-3 py-4 rounded-md text-base font-bold uppercase tracking-wider text-center border-b border-white/5">Home</a>
+        <a href="#leaderboard" class="mobile-link text-gray-300 hover:text-[#ff7b00] block px-3 py-4 rounded-md text-base font-bold uppercase tracking-wider text-center border-b border-white/5">Leaderboard</a>
+        <a href="#schedule" class="mobile-link text-gray-300 hover:text-[#ff7b00] block px-3 py-4 rounded-md text-base font-bold uppercase tracking-wider text-center border-b border-white/5">Schedule</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================================== -->
+  <!-- HERO SECTION -->
+  <!-- ===================================== -->
+  <section id="home" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+    <!-- Background with overlay -->
+    <div class="absolute inset-0 z-0" style="background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center; background-attachment: fixed;">
+      <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-[#050505]"></div>
+      <div class="absolute inset-0 opacity-20" style="background-image: linear-gradient(rgba(0, 255, 204, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 204, 0.1) 1px, transparent 1px); background-size: 40px 40px;"></div>
+    </div>
+
+    <div class="relative z-10 text-center px-4 max-w-5xl mx-auto flex flex-col items-center">
+      <div class="inline-block mb-4 px-4 py-1 border border-[#00ffcc]/30 bg-[#00ffcc]/10 rounded-full text-[#00ffcc] font-mono text-sm sm:text-base tracking-widest uppercase backdrop-blur-sm animate-pulse">
+        Grand Finals • Phase 2
+      </div>
+      
+      <h1 class="font-title text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500 tracking-tighter mb-2 leading-none">
+        BATTLE <span class="text-[#ff7b00] text-glow-orange block sm:inline">ARENA</span>
+      </h1>
+      
+      <p class="font-mono text-gray-300 mt-6 text-lg sm:text-xl md:text-2xl max-w-2xl mx-auto tracking-wide mb-10">
+        The ultimate clash of titans. 12 Teams. 5 Maps. 1 Champion. Welcome to the IRIS 2K26 Championship.
+      </p>
+      
+      <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
+        <a href="#leaderboard" class="group relative px-8 py-4 bg-transparent text-[#ff7b00] border-2 border-[#ff7b00] font-bold text-lg uppercase tracking-widest overflow-hidden transition-all hover:text-black">
+          <div class="absolute inset-0 bg-[#ff7b00] transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-in-out z-0"></div>
+          <span class="relative z-10 flex items-center justify-center gap-2">View Standings <i data-lucide="chevron-right" class="w-5 h-5"></i></span>
+        </a>
+        
+        <button class="px-8 py-4 bg-white/5 text-white border border-white/20 font-bold text-lg uppercase tracking-widest backdrop-blur-sm hover:bg-white/10 transition-all flex items-center justify-center gap-2">
+          <i data-lucide="trophy" class="w-5 h-5 text-[#00ffcc]"></i> Prize Pool: $100K
+        </button>
+      </div>
+    </div>
+    
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce flex-col items-center text-gray-500 hidden md:flex">
+      <span class="font-mono text-xs tracking-widest uppercase mb-2">Scroll</span>
+      <div class="w-[1px] h-12 bg-gradient-to-b from-[#ff7b00] to-transparent"></div>
+    </div>
+  </section>
+
+  <!-- ===================================== -->
+  <!-- LEADERBOARD SECTION -->
+  <!-- ===================================== -->
+  <section id="leaderboard" class="relative py-20 px-4 sm:px-6 lg:px-8 bg-[#050505]">
+    <!-- Background Decor -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+      <div class="absolute top-1/4 left-0 w-96 h-96 bg-[#ff7b00] opacity-[0.03] blur-[100px] rounded-full"></div>
+      <div class="absolute bottom-1/4 right-0 w-96 h-96 bg-[#00ffcc] opacity-[0.03] blur-[100px] rounded-full"></div>
+    </div>
+
+    <div class="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center">
+      
+      <!-- Section Header -->
+      <div class="text-center mb-12">
+        <h2 class="font-title text-4xl md:text-5xl text-[#ff9900] tracking-wider mb-2 text-glow-orange uppercase">
+          Tournament Leaderboard
+        </h2>
+        <div class="flex items-center justify-center gap-2 mt-4 font-mono text-white/90">
+          <div class="w-3 h-3 rounded-full bg-[#00ffcc] animate-pulse shadow-[0_0_10px_#00ffcc]"></div>
+          <span class="font-bold tracking-widest text-base">LIVE - <span id="live-timer"></span></span>
+        </div>
+      </div>
+
+      <!-- Tabs Container -->
+      <div id="tabs-container" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8 w-full">
+        <!-- Tabs will be generated via JS -->
+      </div>
+
+      <!-- Leaderboard Table Container -->
+      <div class="w-full bg-[#0a0a0a] rounded-xl border border-white/10 overflow-hidden shadow-2xl relative min-h-[300px]">
+        
+        <!-- Subtle top edge glow -->
+        <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#ff7b00]/50 to-transparent"></div>
+
+        <!-- Table Header -->
+        <div class="flex items-center px-4 md:px-6 py-4 bg-[#111] border-b border-white/10 text-[#ff7b00] font-bold tracking-widest text-xs sm:text-sm uppercase">
+          <div class="w-12 sm:w-16 text-center">RANK</div>
+          <div class="flex-1 ml-2">TEAM</div>
+          <div class="w-10 sm:w-16 text-center">PP</div>
+          <div class="w-10 sm:w-16 text-center">KP</div>
+          <div class="w-16 sm:w-24 text-center text-glow-orange text-white">TOTAL</div>
+        </div>
+
+        <!-- Table Body -->
+        <div id="leaderboard-body" class="flex flex-col">
+          <!-- Rows will be injected by JS -->
+          <div class="py-20 text-center font-mono text-[#00ffcc] animate-pulse">
+            SYNCING DATA...
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================== -->
+  <!-- SCHEDULE SECTION -->
+  <!-- ===================================== -->
+  <section id="schedule" class="py-20 px-4 sm:px-6 lg:px-8 bg-[#020202] border-t border-white/5 relative overflow-hidden">
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-[500px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#00ffcc]/5 via-transparent to-transparent pointer-events-none"></div>
+
+    <div class="max-w-6xl mx-auto relative z-10">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+        <div>
+          <h2 class="font-title text-4xl md:text-5xl text-white tracking-wider mb-2 uppercase">
+            Match <span class="text-[#00ffcc]">Schedule</span>
+          </h2>
+          <p class="font-mono text-gray-400 tracking-widest uppercase text-sm">Day 1 • Grand Finals</p>
+        </div>
+        <button class="flex items-center gap-2 bg-[#111] hover:bg-[#222] text-white px-6 py-3 border border-white/10 rounded-sm font-bold uppercase tracking-wider transition-colors w-max">
+          <i data-lucide="calendar" class="w-5 h-5 text-[#00ffcc]"></i> Add to Calendar
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Schedule Item 1 -->
+        <div class="bg-[#0a0a0a] border border-white/10 p-6 rounded-lg hover:border-[#00ffcc]/50 transition-colors group relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-full h-1 bg-gray-600"></div>
+          <div class="flex justify-between items-start mb-6 pt-2">
+            <div>
+              <h3 class="font-title text-xl text-white mb-1 uppercase group-hover:text-[#00ffcc] transition-colors">Match 1</h3>
+              <p class="font-mono text-gray-400 text-sm tracking-widest">Bermuda</p>
+            </div>
+            <div class="px-3 py-1 rounded-sm text-xs font-bold uppercase tracking-wider border bg-white/5 text-gray-500 border-white/10">Completed</div>
+          </div>
+          <div class="flex items-center justify-between border-t border-white/5 pt-4">
+            <span class="font-mono text-lg text-white font-bold">14:00 IST</span>
+          </div>
+        </div>
+
+        <!-- Schedule Item 2 -->
+        <div class="bg-[#0a0a0a] border border-white/10 p-6 rounded-lg hover:border-[#00ffcc]/50 transition-colors group relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-full h-1 bg-gray-600"></div>
+          <div class="flex justify-between items-start mb-6 pt-2">
+            <div>
+              <h3 class="font-title text-xl text-white mb-1 uppercase group-hover:text-[#00ffcc] transition-colors">Match 2</h3>
+              <p class="font-mono text-gray-400 text-sm tracking-widest">Purgatory</p>
+            </div>
+            <div class="px-3 py-1 rounded-sm text-xs font-bold uppercase tracking-wider border bg-white/5 text-gray-500 border-white/10">Completed</div>
+          </div>
+          <div class="flex items-center justify-between border-t border-white/5 pt-4">
+            <span class="font-mono text-lg text-white font-bold">15:00 IST</span>
+          </div>
+        </div>
+
+        <!-- Schedule Item 3 -->
+        <div class="bg-[#0a0a0a] border border-white/10 p-6 rounded-lg hover:border-[#00ffcc]/50 transition-colors group relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-full h-1 bg-[#00ffcc] shadow-[0_0_10px_#00ffcc]"></div>
+          <div class="flex justify-between items-start mb-6 pt-2">
+            <div>
+              <h3 class="font-title text-xl text-white mb-1 uppercase group-hover:text-[#00ffcc] transition-colors">Match 3</h3>
+              <p class="font-mono text-gray-400 text-sm tracking-widest">Kalahari</p>
+            </div>
+            <div class="px-3 py-1 rounded-sm text-xs font-bold uppercase tracking-wider border bg-[#00ffcc]/10 text-[#00ffcc] border-[#00ffcc]/30 animate-pulse">Live</div>
+          </div>
+          <div class="flex items-center justify-between border-t border-white/5 pt-4">
+            <span class="font-mono text-lg text-white font-bold">16:00 IST</span>
+          </div>
+        </div>
+
+        <!-- Schedule Item 4 -->
+        <div class="bg-[#0a0a0a] border border-white/10 p-6 rounded-lg hover:border-[#00ffcc]/50 transition-colors group relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-full h-1 bg-[#ff7b00]"></div>
+          <div class="flex justify-between items-start mb-6 pt-2">
+            <div>
+              <h3 class="font-title text-xl text-white mb-1 uppercase group-hover:text-[#00ffcc] transition-colors">Match 4</h3>
+              <p class="font-mono text-gray-400 text-sm tracking-widest">Alpine</p>
+            </div>
+            <div class="px-3 py-1 rounded-sm text-xs font-bold uppercase tracking-wider border bg-[#ff7b00]/10 text-[#ff7b00] border-[#ff7b00]/30">Upcoming</div>
+          </div>
+          <div class="flex items-center justify-between border-t border-white/5 pt-4">
+            <span class="font-mono text-lg text-white font-bold">17:00 IST</span>
+          </div>
+        </div>
+
+        <!-- Schedule Item 5 -->
+        <div class="bg-[#0a0a0a] border border-white/10 p-6 rounded-lg hover:border-[#00ffcc]/50 transition-colors group relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-full h-1 bg-[#ff7b00]"></div>
+          <div class="flex justify-between items-start mb-6 pt-2">
+            <div>
+              <h3 class="font-title text-xl text-white mb-1 uppercase group-hover:text-[#00ffcc] transition-colors">Match 5</h3>
+              <p class="font-mono text-gray-400 text-sm tracking-widest">Nexterra</p>
+            </div>
+            <div class="px-3 py-1 rounded-sm text-xs font-bold uppercase tracking-wider border bg-[#ff7b00]/10 text-[#ff7b00] border-[#ff7b00]/30">Upcoming</div>
+          </div>
+          <div class="flex items-center justify-between border-t border-white/5 pt-4">
+            <span class="font-mono text-lg text-white font-bold">18:00 IST</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================== -->
+  <!-- FOOTER -->
+  <!-- ===================================== -->
+  <footer class="bg-black border-t border-white/10 pt-16 pb-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center md:items-start gap-10">
+      
+      <div class="flex flex-col items-center md:items-start">
+        <div class="flex items-center gap-2 mb-4">
+          <i data-lucide="crosshair" class="text-[#ff7b00] w-8 h-8"></i>
+          <span class="font-title text-2xl tracking-wider text-white">
+            IRIS <span class="text-[#ff7b00]">2K26</span>
+          </span>
+        </div>
+        <p class="text-gray-500 font-mono text-sm max-w-xs text-center md:text-left">
+          The premier Battle Royale esports tournament. Experience the highest tier of competitive gaming.
+        </p>
+      </div>
+
+      <div class="flex gap-16 text-center md:text-left">
+        <div>
+          <h4 class="text-white font-title text-lg mb-4 uppercase tracking-wider">Tournament</h4>
+          <ul class="space-y-2 text-gray-400 font-mono text-sm">
+            <li><a href="#" class="hover:text-[#ff7b00] transition-colors">Rules & Format</a></li>
+            <li><a href="#" class="hover:text-[#ff7b00] transition-colors">Participating Teams</a></li>
+            <li><a href="#" class="hover:text-[#ff7b00] transition-colors">Prize Distribution</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-title text-lg mb-4 uppercase tracking-wider">Socials</h4>
+          <div class="flex gap-4">
+            <a href="#" class="w-10 h-10 bg-[#111] border border-white/10 rounded-full flex items-center justify-center text-gray-400 hover:text-[#ff0000] hover:border-[#ff0000] transition-all"><i data-lucide="youtube" class="w-5 h-5"></i></a>
+            <a href="#" class="w-10 h-10 bg-[#111] border border-white/10 rounded-full flex items-center justify-center text-gray-400 hover:text-[#9146FF] hover:border-[#9146FF] transition-all"><i data-lucide="twitch" class="w-5 h-5"></i></a>
+            <a href="#" class="w-10 h-10 bg-[#111] border border-white/10 rounded-full flex items-center justify-center text-gray-400 hover:text-[#1DA1F2] hover:border-[#1DA1F2] transition-all"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-gray-600 font-mono text-xs">
+        &copy; 2026 IRIS Esports. All rights reserved. Not affiliated with Garena.
+      </p>
+      <div class="flex gap-4 text-gray-600 font-mono text-xs">
+        <a href="#" class="hover:text-gray-300">Privacy Policy</a>
+        <a href="#" class="hover:text-gray-300">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================================== -->
+  <!-- JAVASCRIPT LOGIC -->
+  <!-- ===================================== -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // ==========================================
+    // 📊 SPREADSHEET CONFIGURATION
+    // ==========================================
+    // PASTE YOUR GOOGLE SHEETS CSV LINK HERE:
+    const SPREADSHEET_CSV_URL = ""; 
+
+    /* REQUIRED CSV FORMAT:
+    Match, Team, Logo, PP, KP, Total
+    Match 1, TEAM ALPHA, TA, 12, 14, 26
+    */
+
+    // App State
+    let activeTab = 'Overall';
+    const tabs = ['Overall', 'Match 1', 'Match 2', 'Match 3', 'Match 4', 'Match 5'];
+    let leaderboardData = {
+      'Overall': [], 'Match 1': [], 'Match 2': [], 'Match 3': [], 'Match 4': [], 'Match 5': []
+    };
+
+    // DOM Elements
+    const tabsContainer = document.getElementById('tabs-container');
+    const leaderboardBody = document.getElementById('leaderboard-body');
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menu-icon');
+    const closeIcon = document.getElementById('close-icon');
+    const mobileLinks = document.querySelectorAll('.mobile-link');
+    const liveTimer = document.getElementById('live-timer');
+
+    // Mobile Menu Toggle
+    let isMenuOpen = false;
+    function toggleMenu() {
+      isMenuOpen = !isMenuOpen;
+      if (isMenuOpen) {
+        mobileMenu.classList.remove('hidden');
+        menuIcon.classList.add('hidden');
+        closeIcon.classList.remove('hidden');
+      } else {
+        mobileMenu.classList.add('hidden');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+      }
+    }
+    mobileMenuBtn.addEventListener('click', toggleMenu);
+    mobileLinks.forEach(link => link.addEventListener('click', () => { if(isMenuOpen) toggleMenu(); }));
+
+    // Live Timer
+    setInterval(() => {
+      const now = new Date();
+      liveTimer.innerText = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }, 1000);
+
+    // Fetch and Process Data
+    async function fetchAndProcessData() {
+      if (!SPREADSHEET_CSV_URL) {
+        renderLeaderboard();
+        return;
+      }
+
+      try {
+        const response = await fetch(SPREADSHEET_CSV_URL);
+        const csvText = await response.text();
+
+        const lines = csvText.split('\n').filter(line => line.trim() !== '');
+        if (lines.length < 2) {
+          renderLeaderboard();
+          return;
+        }
+
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        const parsedData = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          // Handle potential commas inside quotes if needed, but simple split for basic CSV
+          const values = lines[i].split(',').map(v => v.trim());
+          const row = {};
+          headers.forEach((header, index) => {
+            row[header] = values[index];
+          });
+          parsedData.push(row);
+        }
+
+        const groupedData = {
+          'Match 1': [], 'Match 2': [], 'Match 3': [], 'Match 4': [], 'Match 5': []
+        };
+        const overallMap = {};
+
+        parsedData.forEach(row => {
+          const matchName = row.match; 
+          if (!matchName) return;
+
+          const teamName = row.team || "Unknown";
+          const logo = row.logo || teamName.substring(0, 2).toUpperCase();
+          const pp = parseInt(row.pp) || 0;
+          const kp = parseInt(row.kp) || 0;
+          const total = parseInt(row.total) || (pp + kp); 
+
+          const teamMatchData = { team: teamName, logo, pp, kp, total };
+
+          if (groupedData[matchName]) {
+            groupedData[matchName].push(teamMatchData);
+          }
+
+          if (!overallMap[teamName]) {
+            overallMap[teamName] = { team: teamName, logo, pp: 0, kp: 0, total: 0 };
+          }
+          overallMap[teamName].pp += pp;
+          overallMap[teamName].kp += kp;
+          overallMap[teamName].total += total;
+        });
+
+        // Sort and Rank
+        Object.keys(groupedData).forEach(match => {
+          groupedData[match].sort((a, b) => b.total - a.total);
+          groupedData[match].forEach((team, index) => { 
+            team.rank = index + 1; 
+          });
+        });
+
+        const overallArray = Object.values(overallMap).sort((a, b) => b.total - a.total);
+        overallArray.forEach((team, index) => { 
+          team.rank = index + 1; 
+        });
+
+        groupedData['Overall'] = overallArray;
+        leaderboardData = groupedData;
+        
+        renderLeaderboard();
+      } catch (error) {
+        console.error("Error fetching or parsing CSV:", error);
+        leaderboardBody.innerHTML = `<div class="py-20 text-center font-mono text-red-500">ERROR LOADING DATA</div>`;
+      }
+    }
+
+    // Render Tabs
+    function renderTabs() {
+      tabsContainer.innerHTML = '';
+      tabs.forEach(tab => {
+        const btn = document.createElement('button');
+        btn.innerText = tab;
+        
+        const baseClasses = "px-5 py-2.5 rounded-lg font-bold text-sm md:text-base tracking-wider transition-all duration-300 backdrop-blur-md border uppercase".split(" ");
+        btn.classList.add(...baseClasses);
+
+        if (activeTab === tab) {
+          btn.classList.add('bg-[#ff7b00]', 'text-black', 'shadow-[0_0_20px_rgba(255,123,0,0.4)]', 'border-[#ff7b00]');
+        } else {
+          btn.classList.add('bg-[#111]', 'text-gray-400', 'border-white/10', 'hover:bg-[#222]', 'hover:text-white');
+        }
+
+        btn.addEventListener('click', () => {
+          activeTab = tab;
+          renderTabs();
+          renderLeaderboard();
+        });
+
+        tabsContainer.appendChild(btn);
+      });
+    }
+
+    // Render Leaderboard Rows
+    function renderLeaderboard() {
+      const currentData = leaderboardData[activeTab] || [];
+      
+      if (currentData.length === 0) {
+        leaderboardBody.innerHTML = `
+          <div class="py-20 text-center font-mono text-gray-500 flex flex-col items-center">
+            ${!SPREADSHEET_CSV_URL ? "<span>⚠ SPREADSHEET CSV URL NOT CONFIGURED</span><span class='text-xs mt-2'>Edit line 440 in HTML code</span>" : "NO DATA AVAILABLE FOR THIS TAB"}
+          </div>`;
+        return;
+      }
+
+      let html = '';
+      currentData.forEach(team => {
+        let badgeStyle = 'bg-[#222] text-gray-400 border border-white/10';
+        if (team.rank === 1) badgeStyle = 'bg-gradient-to-br from-[#ffe53b] to-[#ff2525] text-white shadow-[0_0_10px_rgba(255,229,59,0.5)]';
+        else if (team.rank === 2) badgeStyle = 'bg-gradient-to-br from-[#d3d3d3] to-[#808080] text-white';
+        else if (team.rank === 3) badgeStyle = 'bg-gradient-to-br from-[#cd7f32] to-[#8b4513] text-white';
+
+        html += `
+          <div class="leaderboard-row flex items-center px-4 md:px-6 py-3 sm:py-4 border-b border-white/[0.03]">
+            <div class="w-12 sm:w-16 flex justify-center">
+              <div class="w-8 sm:w-10 h-8 sm:h-10 flex items-center justify-center -skew-x-[15deg] ${badgeStyle}">
+                <span class="skew-x-[15deg] font-title font-bold text-lg sm:text-xl">${team.rank}</span>
+              </div>
+            </div>
+            <div class="flex-1 flex items-center gap-3 sm:gap-4 ml-2 min-w-0">
+              <div class="w-10 h-10 border-l-2 border-b-2 border-[#ff7b00] bg-gradient-to-br from-black to-[#2a1300] flex items-center justify-center rounded-br-lg shrink-0">
+                <span class="font-title font-bold text-[#ff7b00] text-xs sm:text-sm">${team.logo}</span>
+              </div>
+              <span class="font-bold text-base sm:text-xl tracking-wide text-gray-100 truncate uppercase">${team.team}</span>
+            </div>
+            <div class="w-10 sm:w-16 text-center font-mono font-semibold text-gray-400 text-xs sm:text-base">${team.pp}</div>
+            <div class="w-10 sm:w-16 text-center font-mono font-semibold text-gray-400 text-xs sm:text-base">${team.kp}</div>
+            <div class="w-16 sm:w-24 text-center font-bold text-[#ff9900] text-xl sm:text-2xl text-glow-orange font-mono">${team.total}</div>
+          </div>
+        `;
+      });
+
+      leaderboardBody.innerHTML = html;
+    }
+
+    // Init App
+    renderTabs();
+    fetchAndProcessData();
+
+  </script>
+</body>
+</html>
+
+
+```
