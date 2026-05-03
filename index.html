@@ -61,7 +61,17 @@
   </style>
 </head>
 <body class="selection:bg-[#ff7b00] selection:text-black">
+<!-- ===================================== -->
+  <!-- BACKGROUND MUSIC & TOGGLE -->
+  <!-- ===================================== -->
+  <audio id="bg-music" loop>
+    <!-- PASTE YOUR MP3 LINK BELOW -->
+    <source src="https://drive.google.com/uc?export=download&id=1bbfeQIlyuyioUhIpgifqoiF9I2GksOL9" type="audio/mpeg">
+  </audio>
 
+  <button id="music-toggle" class="fixed bottom-6 right-6 z-50 bg-[#111] border border-[#ff7b00]/50 p-3 rounded-full text-[#ff7b00] hover:text-white hover:bg-[#ff7b00] hover:shadow-[0_0_20px_rgba(255,123,0,0.8)] transition-all flex items-center justify-center">
+    <i data-lucide="volume-x" id="music-icon" class="w-6 h-6"></i>
+  </button>
   <nav class="fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-20">
@@ -536,7 +546,45 @@
 
       leaderboardBody.innerHTML = html;
     }
+// ==========================================
+    // 🎵 BACKGROUND MUSIC LOGIC
+    // ==========================================
+    const bgMusic = document.getElementById('bg-music');
+    const musicToggle = document.getElementById('music-toggle');
+    const musicIcon = document.getElementById('music-icon');
+    let isMusicPlaying = false;
 
+    // Set the volume (0.0 is silent, 1.0 is max loud. 0.3 is a good background level)
+    bgMusic.volume = 0.3; 
+
+    function toggleMusic() {
+      if (isMusicPlaying) {
+        bgMusic.pause();
+        musicToggle.innerHTML = '<i data-lucide="volume-x" class="w-6 h-6"></i>';
+      } else {
+        // Try to play the music
+        bgMusic.play().then(() => {
+          musicToggle.innerHTML = '<i data-lucide="volume-2" class="w-6 h-6"></i>';
+        }).catch((error) => {
+          console.log("Browser blocked autoplay.", error);
+        });
+      }
+      isMusicPlaying = !isMusicPlaying;
+      lucide.createIcons(); // Refresh the icon
+    }
+
+    // Toggle when clicking the button
+    musicToggle.addEventListener('click', (e) => {
+      e.stopPropagation(); // Stop this click from triggering the body click
+      toggleMusic();
+    });
+
+    // Auto-play attempt on the FIRST click anywhere on the website
+    document.body.addEventListener('click', () => {
+      if (!isMusicPlaying) {
+        toggleMusic();
+      }
+    }, { once: true });
     // Init App
     renderTabs();
     fetchAndProcessData();
