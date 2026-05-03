@@ -64,10 +64,16 @@
 <!-- ===================================== -->
   <!-- BACKGROUND MUSIC & TOGGLE -->
   <!-- ===================================== -->
-  <audio id="bg-music" loop>
-    <!-- PASTE YOUR MP3 LINK BELOW -->
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+  <audio id="bg-music" loop preload="auto">
+    <!-- YOUR EXACT FREE FIRE THEME SONG -->
+    <source src="https://dl.dropboxusercontent.com/scl/fi/tkorv0kdnczv06bjzhyei/free-fier-old-song-ringtone-2019-viral-ringtone-tune-FF-lovers-ringtone-freefire-free-nTduKncKGnM.mp3?rlkey=hugu4apfohjc85qzceiymub17&st=8dqkba1r&dl=0" type="audio/mpeg">
   </audio>
+
+  <button id="music-toggle" class="fixed bottom-6 right-6 z-50 bg-[#111] border border-[#ff7b00]/50 p-4 rounded-full text-[#ff7b00] transition-all flex items-center justify-center shadow-lg group cursor-pointer">
+    <!-- Load BOTH icons, hide the playing one by default -->
+    <i data-lucide="volume-x" id="icon-muted" class="w-6 h-6 transition-transform group-hover:scale-110"></i>
+    <i data-lucide="volume-2" id="icon-playing" class="w-6 h-6 hidden transition-transform group-hover:scale-110"></i>
+  </button>
 
   <button id="music-toggle" class="fixed bottom-6 right-6 z-50 bg-[#111] border border-[#ff7b00]/50 p-3 rounded-full text-[#ff7b00] hover:text-white hover:bg-[#ff7b00] hover:shadow-[0_0_20px_rgba(255,123,0,0.8)] transition-all flex items-center justify-center">
     <i data-lucide="volume-x" id="music-icon" class="w-6 h-6"></i>
@@ -551,31 +557,46 @@
     // ==========================================
     const bgMusic = document.getElementById('bg-music');
     const musicToggle = document.getElementById('music-toggle');
-    const musicIcon = document.getElementById('music-icon');
+    const iconMuted = document.getElementById('icon-muted');
+    const iconPlaying = document.getElementById('icon-playing');
     let isMusicPlaying = false;
 
-    // Set the volume (0.0 is silent, 1.0 is max loud. 0.3 is a good background level)
+    // Set volume (0.3 is 30% volume)
     bgMusic.volume = 0.3; 
 
     function toggleMusic() {
       if (isMusicPlaying) {
+        // Pause it
         bgMusic.pause();
-        musicToggle.innerHTML = '<i data-lucide="volume-x" class="w-6 h-6"></i>';
+        
+        // Change Icons (Show X, Hide Sound)
+        iconMuted.classList.remove('hidden');
+        iconPlaying.classList.add('hidden');
+        
+        // Remove Glowing Effect
+        musicToggle.classList.remove('bg-[#ff7b00]', 'text-black', 'shadow-[0_0_20px_rgba(255,123,0,0.6)]', 'animate-pulse');
+        musicToggle.classList.add('bg-[#111]', 'text-[#ff7b00]');
+        
       } else {
-        // Try to play the music
+        // Play it
         bgMusic.play().then(() => {
-          musicToggle.innerHTML = '<i data-lucide="volume-2" class="w-6 h-6"></i>';
+          // Change Icons (Hide X, Show Sound)
+          iconMuted.classList.add('hidden');
+          iconPlaying.classList.remove('hidden');
+          
+          // Add Glowing Effect
+          musicToggle.classList.remove('bg-[#111]', 'text-[#ff7b00]');
+          musicToggle.classList.add('bg-[#ff7b00]', 'text-black', 'shadow-[0_0_20px_rgba(255,123,0,0.6)]', 'animate-pulse');
         }).catch((error) => {
           console.log("Browser blocked autoplay.", error);
         });
       }
       isMusicPlaying = !isMusicPlaying;
-      lucide.createIcons(); // Refresh the icon
     }
 
     // Toggle when clicking the button
     musicToggle.addEventListener('click', (e) => {
-      e.stopPropagation(); // Stop this click from triggering the body click
+      e.stopPropagation(); // Stop click from triggering the body click
       toggleMusic();
     });
 
