@@ -62,15 +62,17 @@
 </head>
 <body class="selection:bg-[#ff7b00] selection:text-black">
 <!-- ===================================== -->
-  <!-- BACKGROUND MUSIC & TOGGLE -->
+  <!-- EXPLICIT MUSIC PLAYER -->
   <!-- ===================================== -->
   <audio id="bg-music" loop preload="auto">
     <source src="https://dl.dropboxusercontent.com/scl/fi/tkorv0kdnczv06bjzhyei/free-fier-old-song-ringtone-2019-viral-ringtone-tune-FF-lovers-ringtone-freefire-free-nTduKncKGnM.mp3?rlkey=hugu4apfohjc85qzceiymub17&st=8dqkba1r&dl=0" type="audio/mpeg">
   </audio>
 
-  <button id="music-toggle" style="-webkit-tap-highlight-color: transparent; outline: none;" class="fixed bottom-6 right-6 z-50 p-4 rounded-full transition-all flex items-center justify-center shadow-lg cursor-pointer select-none appearance-none touch-manipulation bg-[#111] text-[#ff7b00] border border-[#ff7b00]/50 focus:outline-none active:outline-none">
-    <i data-lucide="volume-x" id="icon-muted" class="w-6 h-6"></i>
-    <i data-lucide="volume-2" id="icon-playing" class="w-6 h-6 hidden"></i>
+  <!-- Explicit Pill Button -->
+  <button id="music-toggle" style="-webkit-tap-highlight-color: transparent; outline: none;" class="fixed bottom-6 right-6 z-50 px-5 py-3 rounded-full transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer select-none appearance-none bg-[#111] text-[#ff7b00] border border-[#ff7b00]/50 focus:outline-none">
+    <i data-lucide="play" id="icon-play" class="w-4 h-4 pointer-events-none"></i>
+    <i data-lucide="pause" id="icon-pause" class="w-4 h-4 hidden pointer-events-none"></i>
+    <span id="music-text" class="font-bold tracking-wider uppercase text-xs font-mono pointer-events-none">Play Theme</span>
   </button>
 
   <button id="music-toggle" class="fixed bottom-6 right-6 z-50 bg-[#111] border border-[#ff7b00]/50 p-3 rounded-full text-[#ff7b00] hover:text-white hover:bg-[#ff7b00] hover:shadow-[0_0_20px_rgba(255,123,0,0.8)] transition-all flex items-center justify-center">
@@ -551,62 +553,43 @@
       leaderboardBody.innerHTML = html;
     }
 // ==========================================
-    // 🎵 BACKGROUND MUSIC LOGIC (BULLETPROOF)
+// ==========================================
+    // 🎵 EXPLICIT MUSIC PLAYER LOGIC
     // ==========================================
     const bgMusic = document.getElementById('bg-music');
     const musicToggle = document.getElementById('music-toggle');
-    const iconMuted = document.getElementById('icon-muted');
-    const iconPlaying = document.getElementById('icon-playing');
+    const iconPlay = document.getElementById('icon-play');
+    const iconPause = document.getElementById('icon-pause');
+    const musicText = document.getElementById('music-text');
 
     // Set volume to 30%
     bgMusic.volume = 0.3; 
 
-    // 1. Sync the Button UI strictly to the Audio's REAL state
-    function updateUI(isPlaying) {
-      if (isPlaying) {
-        iconMuted.classList.add('hidden');
-        iconPlaying.classList.remove('hidden');
-        // Playing Style (Glowing Orange, No Border)
-        musicToggle.classList.remove('bg-[#111]', 'text-[#ff7b00]', 'border-[#ff7b00]/50');
-        musicToggle.classList.add('bg-[#ff7b00]', 'text-black', 'border-transparent', 'shadow-[0_0_20px_rgba(255,123,0,0.6)]', 'animate-pulse');
-      } else {
-        iconMuted.classList.remove('hidden');
-        iconPlaying.classList.add('hidden');
-        // Paused Style (Dark, Orange Border)
-        musicToggle.classList.remove('bg-[#ff7b00]', 'text-black', 'border-transparent', 'shadow-[0_0_20px_rgba(255,123,0,0.6)]', 'animate-pulse');
-        musicToggle.classList.add('bg-[#111]', 'text-[#ff7b00]', 'border-[#ff7b00]/50');
-      }
-    }
-
-    // Tell the UI to update ONLY when the audio actually plays or pauses
-    bgMusic.addEventListener('play', () => updateUI(true));
-    bgMusic.addEventListener('pause', () => updateUI(false));
-
-    // 2. Simple Button Click Logic
+    // Dead-simple click logic. You click it, it plays. You click it again, it pauses.
     musicToggle.addEventListener('click', (e) => {
       e.preventDefault();
-      e.stopPropagation();
       
       if (bgMusic.paused) {
-        bgMusic.play().catch(err => console.log("Play blocked by browser:", err));
+        bgMusic.play();
+        
+        // Change UI to Playing State
+        iconPlay.classList.add('hidden');
+        iconPause.classList.remove('hidden');
+        musicText.innerText = "Pause Theme";
+        musicToggle.classList.remove('bg-[#111]', 'text-[#ff7b00]', 'border-[#ff7b00]/50');
+        musicToggle.classList.add('bg-[#ff7b00]', 'text-black', 'border-transparent', 'shadow-[0_0_15px_rgba(255,123,0,0.5)]');
       } else {
         bgMusic.pause();
+        
+        // Change UI back to Paused State
+        iconPlay.classList.remove('hidden');
+        iconPause.classList.add('hidden');
+        musicText.innerText = "Play Theme";
+        musicToggle.classList.remove('bg-[#ff7b00]', 'text-black', 'border-transparent', 'shadow-[0_0_15px_rgba(255,123,0,0.5)]');
+        musicToggle.classList.add('bg-[#111]', 'text-[#ff7b00]', 'border-[#ff7b00]/50');
       }
     });
-
-    // 3. Smart Auto-Play (Only triggers if they click the background, NOT the button)
-    const startAudio = (e) => {
-      // Don't auto-play if they specifically clicked the mute button
-      if (!e.target.closest('#music-toggle') && bgMusic.paused) {
-        bgMusic.play().catch(() => console.log("Waiting for user interaction"));
-      }
-      // Remove these background listeners after the first tap
-      document.removeEventListener('click', startAudio);
-      document.removeEventListener('touchstart', startAudio);
-    };
-
-    document.addEventListener('click', startAudio);
-    document.addEventListener('touchstart', startAudio, { passive: true });
+    
     // Init App
     renderTabs();
     fetchAndProcessData();
