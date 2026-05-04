@@ -58,19 +58,7 @@
     .text-glow-orange { text-shadow: 0 0 15px rgba(234, 88, 12, 0.8); }
     .text-glow-cyan { text-shadow: 0 0 15px rgba(0, 255, 204, 0.8); }
 
-    /* Live Broadcast Ticker Animation */
-    @keyframes ticker-scroll {
-      0% { transform: translateX(100vw); }
-      100% { transform: translateX(-100%); }
-    }
-    .animate-ticker {
-      display: inline-block;
-      white-space: nowrap;
-      animation: ticker-scroll 30s linear infinite;
-    }
-    .animate-ticker:hover { animation-play-state: paused; }
-  </style>
-</head>
+    
 <body class="selection:bg-[#ff7b00] selection:text-black">
 
   <audio id="bg-music" loop preload="auto">
@@ -324,9 +312,7 @@
 
     const SCHEDULE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS4yAOi5TTumkZ3MaGlYbxu0xg7CldZTMakWTLncAO7CzgF0I0K3nnH3f4jk5OREAYwRpZ__mICnTJ7/pub?gid=322356309&single=true&output=csv"; 
 
-    // YOUR NEW TICKER URL (Column A: Icon name, Column B: Message)
-    const TICKER_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZtfHciZVOwe9wEjkvYQABYyLVPMxY-O0NtZufM3YCVrRzYu2yAMCY-vJpvR5G7Nn1UiJ0up2EuKJL/pub?gid=0&single=true&output=csv"; 
-
+    
     // App State
     let activeTab = 'Overall';
     const tabs = ['Overall', 'Match 1', 'Match 2', 'Match 3', 'Match 4', 'Match 5'];
@@ -370,7 +356,7 @@
     // ==========================================
     // ⏳ DOOMSDAY COUNTDOWN TIMER (Set to May 8, 2026)
     // ==========================================
-    const countDownDate = new Date("May 8, 2026 12:00:00").getTime();
+    const countDownDate = new Date("May 8, 2026 21:00:00").getTime();
 
     const timerInterval = setInterval(function() {
       const now = new Date().getTime();
@@ -992,8 +978,7 @@
     renderTabs();
     fetchAndProcessData();
     fetchAndRenderSchedule();
-    fetchAndRenderTicker();
-
+    
   </script>
 </body>
 </html>
