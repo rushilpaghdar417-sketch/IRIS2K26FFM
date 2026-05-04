@@ -194,7 +194,10 @@
           <span class="font-bold tracking-widest text-base">LIVE - <span id="live-timer"></span></span>
         </div>
       </div>
+<!-- KILL LEADER MVP SPOTLIGHT -->
+      <div id="mvp-container" class="w-full mb-8 transition-all duration-500 hidden"></div>
 
+      
       <div id="tabs-container" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8 w-full">
         </div>
 
@@ -538,6 +541,7 @@
     // Render Leaderboard Rows
     function renderLeaderboard() {
       const currentData = leaderboardData[activeTab] || [];
+      const mvpContainer = document.getElementById('mvp-container'); // Grabs the MVP box
       
       if (currentData.length === 0) {
         leaderboardBody.innerHTML = `
@@ -545,9 +549,49 @@
             <span>NO DATA AVAILABLE FOR THIS TAB</span>
             <span class='text-xs mt-2'>Make sure you added the CSV link for ${activeTab}</span>
           </div>`;
+        if (mvpContainer) mvpContainer.classList.add('hidden'); // Hide MVP if no data
         return;
       }
 
+      // ==========================================
+      // 🔥 NEW: MVP TOP FRAGGER LOGIC
+      // ==========================================
+      if (mvpContainer) {
+        // Find the team with the highest KP (Kill Points)
+        const mvp = currentData.reduce((prev, current) => (parseInt(prev.kp) > parseInt(current.kp)) ? prev : current);
+        
+        if (mvp && parseInt(mvp.kp) > 0) {
+          mvpContainer.innerHTML = `
+            <div class="relative bg-gradient-to-r from-red-950 via-black to-black border border-red-500/50 p-4 sm:p-6 rounded-xl overflow-hidden flex items-center justify-between shadow-[0_0_30px_rgba(255,0,0,0.2)] group">
+              <div class="absolute -inset-1 bg-gradient-to-r from-red-600 to-purple-900 blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+              
+              <div class="relative flex items-center gap-4 sm:gap-6 z-10">
+                <div class="w-14 h-14 sm:w-20 sm:h-20 bg-red-950 border-2 border-red-500 flex items-center justify-center rotate-45 shadow-[0_0_15px_rgba(255,0,0,0.5)]">
+                  <span class="font-title font-bold text-white text-lg sm:text-2xl -rotate-45">${mvp.logo}</span>
+                </div>
+                <div>
+                  <div class="text-red-500 font-mono text-xs sm:text-sm font-bold tracking-widest uppercase mb-1 flex items-center gap-2">
+                    <i data-lucide="flame" class="w-4 h-4 animate-pulse"></i> Top Fragger
+                  </div>
+                  <div class="font-title text-xl sm:text-3xl text-white uppercase tracking-wider">${mvp.team}</div>
+                </div>
+              </div>
+
+              <div class="relative z-10 text-right pr-2">
+                <div class="font-mono text-gray-400 text-[10px] sm:text-sm uppercase tracking-widest mb-1">Total Kills</div>
+                <div class="font-title text-3xl sm:text-5xl text-red-500 drop-shadow-[0_0_10px_rgba(255,0,0,0.8)]">${mvp.kp}</div>
+              </div>
+            </div>
+          `;
+          mvpContainer.classList.remove('hidden');
+        } else {
+          mvpContainer.classList.add('hidden');
+        }
+      }
+
+      // ==========================================
+      // 🏆 YOUR EXISTING LEADERBOARD LOGIC
+      // ==========================================
       let html = '';
       currentData.forEach(team => {
         let badgeStyle = 'bg-[#222] text-gray-400 border border-white/10';
@@ -578,10 +622,13 @@
       // Draw the HTML to the screen
       leaderboardBody.innerHTML = html;
 
-      // 🔥 IGNITE THE TOP 3 IMMEDIATELY AFTER DRAWING! 🔥
+      // 🔥 YOUR EXISTING FIRE SCRIPT 🔥
       if (currentData.length >= 1) igniteElement(leaderboardBody.children[0], 1);
       if (currentData.length >= 2) igniteElement(leaderboardBody.children[1], 2);
       if (currentData.length >= 3) igniteElement(leaderboardBody.children[2], 3);
+
+      // Refresh icons so the MVP flame icon actually loads!
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
     // ==========================================
     // ❄️ WINTERLANDS SNOW GENERATOR
