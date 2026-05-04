@@ -74,7 +74,10 @@
     <i data-lucide="pause" id="icon-pause" class="w-4 h-4 hidden pointer-events-none"></i>
     <span id="music-text" class="font-bold tracking-wider uppercase text-xs font-mono pointer-events-none">Play Theme</span>
   </button>
-
+<!-- ===================================== -->
+  <!-- ❄️ WINTERLANDS SNOW EFFECT LAYER -->
+  <!-- ===================================== -->
+  <canvas id="snow-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-[100]"></canvas>
 
   <nav class="fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -552,6 +555,83 @@
 
       leaderboardBody.innerHTML = html;
     }
+    // ==========================================
+    // ❄️ WINTERLANDS SNOW GENERATOR
+    // ==========================================
+    const canvas = document.getElementById('snow-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+    let snowflakes = [];
+
+    // Mobile Optimization: 50 flakes for phones, 150 for desktop
+    const maxFlakes = window.innerWidth < 768 ? 50 : 150;
+
+    // Create the initial snowflakes
+    for (let i = 0; i < maxFlakes; i++) {
+      snowflakes.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: Math.random() * 2 + 0.5, // Radius (tiny crystals)
+        d: Math.random() * 1 + 0.5, // Density (fall speed)
+        a: Math.random() * Math.PI * 2 // Angle (sway)
+      });
+    }
+
+    function drawSnow() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.7)"; // Crystal opacity
+      ctx.beginPath();
+      for (let i = 0; i < maxFlakes; i++) {
+        let f = snowflakes[i];
+        ctx.moveTo(f.x, f.y);
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2, true);
+      }
+      ctx.fill();
+      updateSnow();
+    }
+
+    let angle = 0;
+    function updateSnow() {
+      angle += 0.01;
+      for (let i = 0; i < maxFlakes; i++) {
+        let f = snowflakes[i];
+        
+        // Move the snowflake down and sway it left/right
+        f.y += Math.cos(angle + f.d) + 1 + f.r / 2;
+        f.x += Math.sin(angle) * 1.5;
+
+        // If the snowflake goes off-screen, reset it to the top
+        if (f.x > width + 5 || f.x < -5 || f.y > height) {
+          if (i % 3 > 0) {
+            snowflakes[i] = { x: Math.random() * width, y: -10, r: f.r, d: f.d, a: f.a };
+          } else {
+            // Handle side winds
+            if (Math.sin(angle) > 0) {
+              snowflakes[i] = { x: -5, y: Math.random() * height, r: f.r, d: f.d, a: f.a };
+            } else {
+              snowflakes[i] = { x: width + 5, y: Math.random() * height, r: f.r, d: f.d, a: f.a };
+            }
+          }
+        }
+      }
+    }
+
+    // Animation Loop
+    function loopSnow() {
+      drawSnow();
+      requestAnimationFrame(loopSnow);
+    }
+
+    // Keep canvas sized correctly if screen is rotated/resized
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    // Start the blizzard!
+    loopSnow();
 // ==========================================
 // ==========================================
     // 🎵 EXPLICIT MUSIC PLAYER LOGIC
