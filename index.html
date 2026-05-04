@@ -553,7 +553,13 @@
         `;
       });
 
+      // Draw the HTML to the screen
       leaderboardBody.innerHTML = html;
+
+      // 🔥 IGNITE THE TOP 3 IMMEDIATELY AFTER DRAWING! 🔥
+      if (currentData.length >= 1) igniteElement(leaderboardBody.children[0], 1);
+      if (currentData.length >= 2) igniteElement(leaderboardBody.children[1], 2);
+      if (currentData.length >= 3) igniteElement(leaderboardBody.children[2], 3);
     }
     // ==========================================
     // ❄️ WINTERLANDS SNOW GENERATOR
@@ -669,7 +675,75 @@
         musicToggle.classList.add('bg-[#111]', 'text-[#ff7b00]', 'border-[#ff7b00]/50');
       }
     });
+
+    // ==========================================
+    // 🔥 DYNAMIC FIRE PARTICLES
+    // ==========================================
     
+    // Inject the CSS animation
+    const fireStyles = document.createElement('style');
+    fireStyles.innerHTML = `
+      @keyframes floatUpAndFade {
+        0% { transform: translateY(10px) scale(1); opacity: 1; }
+        100% { transform: translateY(-30px) scale(0.3); opacity: 0; }
+      }
+      .fire-ember {
+        position: absolute;
+        bottom: -5px;
+        border-radius: 50%;
+        animation: floatUpAndFade linear infinite;
+        pointer-events: none;
+        filter: blur(2px);
+        mix-blend-mode: screen;
+        z-index: 0;
+      }
+    `;
+    document.head.appendChild(fireStyles);
+
+    function igniteElement(row, rank) {
+      if (!row) return;
+
+      row.style.position = 'relative';
+      row.style.overflow = 'hidden';
+
+      // Push text layers to the front so fire stays behind
+      Array.from(row.children).forEach(child => {
+        child.style.position = 'relative';
+        child.style.zIndex = '10';
+      });
+
+      const particleCount = rank === 1 ? 50 : rank === 2 ? 25 : 10;
+      const colors = rank === 1 ? ['#ffffff', '#ffea00', '#ff7b00'] : 
+                     rank === 2 ? ['#ffea00', '#ff7b00', '#ff2a00'] : 
+                                  ['#ff7b00', '#ff2a00', '#cc0000'];
+
+      for (let i = 0; i < particleCount; i++) {
+        const ember = document.createElement('div');
+        ember.className = 'fire-ember';
+        
+        const size = Math.random() * 6 + 3; 
+        const left = Math.random() * 100; 
+        const duration = Math.random() * 1.5 + 0.5; 
+        const delay = Math.random() * 2; 
+        const color = colors[Math.floor(Math.random() * colors.length)];
+
+        ember.style.width = `${size}px`;
+        ember.style.height = `${size}px`;
+        ember.style.left = `${left}%`;
+        ember.style.background = color;
+        ember.style.boxShadow = `0 0 ${size * 2}px ${color}`; 
+        ember.style.animationDuration = `${duration}s`;
+        ember.style.animationDelay = `-${delay}s`;
+
+        row.appendChild(ember);
+      }
+
+      const glowOpacity = rank === 1 ? 0.3 : rank === 2 ? 0.15 : 0.05;
+      const glow = document.createElement('div');
+      glow.className = 'absolute inset-0 z-0 pointer-events-none';
+      glow.style.background = `linear-gradient(to top, rgba(255, 123, 0, ${glowOpacity}), transparent)`;
+      row.appendChild(glow);
+    }
     // Init App
     renderTabs();
     fetchAndProcessData();
